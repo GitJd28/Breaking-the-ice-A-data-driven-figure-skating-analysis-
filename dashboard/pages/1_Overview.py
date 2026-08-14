@@ -34,7 +34,7 @@ with st.sidebar:
 
 # Page header
 st.markdown(
-    "<div class='page-title'>🌍 Overview — The Global Picture</div>",
+    "<div class='page-title'>🌍 Overview : The Global Picture</div>",
     unsafe_allow_html=True
 )
 st.markdown(

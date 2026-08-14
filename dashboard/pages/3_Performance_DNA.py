@@ -31,7 +31,7 @@ df_raw, df_clean = load_aggregate()
 df_long = load_long()
 
 st.markdown(
-    "<div class='page-title'>🧬 Performance DNA — What Wins Medals?</div>",
+    "<div class='page-title'>🧬 Performance DNA : What Wins Medals?</div>",
     unsafe_allow_html=True
 )
 st.markdown(
@@ -47,7 +47,7 @@ st.markdown("""
 <div class='info-card' style='border-left: 4px solid #3D7EFF;'>
     <h3>🔑 Headline Finding</h3>
     <p>Short Program rank alone explains <b style='color:#3D7EFF;'>53.8%</b>
-    of medal prediction in our Random Forest model — more than total score,
+    of medal prediction in our Random Forest model more than the total score,
     technical score, or artistry combined. <b>Where you stand after the
     Short Program is the single most important factor in winning an
     Olympic medal.</b></p>
@@ -146,7 +146,7 @@ st.markdown("<br>", unsafe_allow_html=True)
 
 # Score Anatomy
 st.markdown(
-    "<div class='section-title'>📊 Score Anatomy — What Makes a Medal Score?</div>",
+    "<div class='section-title'>📊 Score Anatomy: What Makes a Medal Score?</div>",
     unsafe_allow_html=True
 )
 
@@ -206,7 +206,7 @@ st.markdown("<br>", unsafe_allow_html=True)
 
 # Deduction analysis
 st.markdown(
-    "<div class='section-title'>⚠️ Deduction Analysis — Do Falls Cost Medals?</div>",
+    "<div class='section-title'>⚠️ Deduction Analysis - Do Falls Cost Medals?</div>",
     unsafe_allow_html=True
 )
 

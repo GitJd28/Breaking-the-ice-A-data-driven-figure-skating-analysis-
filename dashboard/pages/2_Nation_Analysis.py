@@ -33,7 +33,7 @@ df_long = load_long()
 
 # Header
 st.markdown(
-    "<div class='page-title'>🏳️ Nation Analysis — Deep Dive</div>",
+    "<div class='page-title'>🏳️ Nation Analysis: A Deep Dive</div>",
     unsafe_allow_html=True
 )
 st.markdown(
@@ -160,7 +160,7 @@ st.markdown("<br>", unsafe_allow_html=True)
 # TES vs PCS style
 st.markdown(
     "<div class='section-title'>"
-    "🎯 Technical vs Artistic — Nation Style</div>",
+    "🎯 Technical vs Artistic - Nation Style</div>",
     unsafe_allow_html=True
 )
 

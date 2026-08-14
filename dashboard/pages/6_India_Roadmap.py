@@ -32,13 +32,13 @@ df_raw, df_clean = load_aggregate()
 rf_model, lr_model, scaler = load_models()
 
 st.markdown(
-    "<div class='page-title'>🇮🇳 India's Roadmap — Breaking the Ice</div>",
+    "<div class='page-title'>🇮🇳 India's Roadmap - Breaking the Ice</div>",
     unsafe_allow_html=True
 )
 st.markdown(
     "<div class='page-subtitle'>"
     "A data-backed development pathway for India's entry into "
-    "Olympic figure skating — from first qualification to medal contention."
+    "Olympic figure skating; from first qualification to medal contention."
     "</div>",
     unsafe_allow_html=True
 )
@@ -67,7 +67,7 @@ st.markdown("""
 <div class='india-callout'>
     <p>🇮🇳 <b>India has never qualified a single figure skater for the
     Winter Olympics.</b> Across 20 years and 75 nations, India is absent.
-    But the data shows us exactly what it would take to change that —
+    But the data shows us exactly what it would take to change that
     and Kazakhstan's 2026 gold proves emerging nations CAN break through.</p>
 </div>
 """, unsafe_allow_html=True)
@@ -228,7 +228,7 @@ st.markdown("<br>", unsafe_allow_html=True)
 
 # Recommendations
 st.markdown(
-    "<div class='section-title'>✅ Data-Backed Recommendations</div>",
+    "<div class='section-title'>✅ Data-Backed Recommendations:</div>",
     unsafe_allow_html=True
 )
 

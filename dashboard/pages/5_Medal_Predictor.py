@@ -109,7 +109,7 @@ st.markdown("<br>", unsafe_allow_html=True)
 
 # Interactive predictor
 st.markdown(
-    "<div class='section-title'>🎛️ Try It — Enter Scores</div>",
+    "<div class='section-title'>🎛️ Try It!  Enter Scores</div>",
     unsafe_allow_html=True
 )
 
