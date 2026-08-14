@@ -8,6 +8,8 @@ import os
 sys.path.append(
     os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 )
+from components.styles import load_css, apply_theme, PLOTLY_THEME
+st.markdown(load_css(), unsafe_allow_html=True)
 from components.data_loader import (
     load_aggregate, load_long,
     MEDAL_COLORS, COLORS, TRADITIONAL_NATIONS
@@ -79,7 +81,8 @@ with col_left:
         coloraxis_showscale=False,
         xaxis_title="Number of Athletes",
         yaxis_title="",
-    )
+    ) 
+    fig = apply_theme(fig, height=450, title="Your Title Here")
     st.plotly_chart(fig_apps, use_container_width=True)
 
 
@@ -133,6 +136,7 @@ with col_right:
             yaxis_title="",
             legend_title="Medal",
         )
+        fig = apply_theme(fig, height=450, title="Your Title Here")
         st.plotly_chart(fig_medals, use_container_width=True)
 
 st.markdown("---")
@@ -183,6 +187,7 @@ with col_tss:
         yaxis_title="Count",
         legend_title="Medal Status",
     )
+    fig = apply_theme(fig, height=450, title="Your Title Here")
     st.plotly_chart(fig_dist, use_container_width=True)
 
 # ── Chart 4: TES vs PCS ─────────────────────
@@ -234,6 +239,7 @@ with col_breakdown:
         yaxis_title="Program Components (PCS)",
         legend_title="Medal Status",
     )
+    fig = apply_theme(fig, height=450, title="Your Title Here")
     st.plotly_chart(fig_scatter, use_container_width=True)
 
 st.markdown("---")
@@ -304,6 +310,7 @@ fig_trend.update_layout(
         tickvals=df_clean['year'].unique()
     ),
 )
+fig = apply_theme(fig, height=450, title="Your Title Here")
 st.plotly_chart(fig_trend, use_container_width=True)
 
 st.markdown("---")
@@ -340,6 +347,7 @@ with col_box:
         yaxis_title="Total Score (TSS)",
         showlegend=False,
     )
+    fig = apply_theme(fig, height=450, title="Your Title Here")
     st.plotly_chart(fig_box, use_container_width=True)
 
 with col_stats:

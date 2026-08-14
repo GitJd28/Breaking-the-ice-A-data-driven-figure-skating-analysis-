@@ -7,6 +7,8 @@ import sys
 import os
 
 sys.path.append(    os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
+from components.styles import load_css, apply_theme, PLOTLY_THEME
+st.markdown(load_css(), unsafe_allow_html=True)
 from components.data_loader import (
     load_aggregate, load_long,
     MEDAL_COLORS, COLORS
@@ -99,6 +101,7 @@ with col_scatter:
         xaxis=dict(range=[0, 32], dtick=5),
         yaxis=dict(range=[0, 32], autorange='reversed'),
     )
+    fig = apply_theme(fig, height=450, title="Your Title Here")
     st.plotly_chart(fig_sp, use_container_width=True)
 
 with col_insight:
@@ -188,6 +191,7 @@ with col_bar:
         yaxis_title="Score Points",
         legend_title="Score Component",
     )
+    fig = apply_theme(fig, height=450, title="Your Title Here")
     st.plotly_chart(fig_bar, use_container_width=True)
 
 with col_radar:
@@ -244,6 +248,7 @@ with col_radar:
         ),
         legend=dict(x=0.8, y=1.1),
     )
+    fig = apply_theme(fig, height=450, title="Your Title Here")
     st.plotly_chart(fig_radar, use_container_width=True)
 
 st.markdown("---")
@@ -292,6 +297,7 @@ with col_ded1:
         yaxis_title="% of Segments",
         yaxis=dict(range=[0, ded_pct['Deduction %'].max() * 1.3]),
     )
+    fig = apply_theme(fig, height=450, title="Your Title Here")
     st.plotly_chart(fig_ded, use_container_width=True)
 
 with col_ded2:
@@ -326,6 +332,7 @@ with col_ded2:
         yaxis_title="Avg Deduction Points",
         legend_title="Medal Status",
     )
+    fig = apply_theme(fig, height=450, title="Your Title Here")
     st.plotly_chart(fig_ded2, use_container_width=True)
 
 st.markdown("---")
@@ -368,6 +375,7 @@ with col_hist:
         yaxis_title="Count",
         legend_title="Medal Status",
     )
+    fig = apply_theme(fig, height=450, title="Your Title Here")
     st.plotly_chart(fig_rank, use_container_width=True)
 
 with col_stats:

@@ -7,6 +7,8 @@ import sys
 import os
 
 sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
+from components.styles import load_css, apply_theme, PLOTLY_THEME
+st.markdown(load_css(), unsafe_allow_html=True)
 from components.data_loader import (
     load_aggregate, load_worldchamp,
     MEDAL_COLORS, COLORS
@@ -114,6 +116,7 @@ with col_trend:
         ),
         legend=dict(x=0.01, y=0.99),
     )
+    fig = apply_theme(fig, height=450, title="Your Title Here")
     st.plotly_chart(fig_trend, use_container_width=True)
 
 with col_dist:
@@ -145,6 +148,7 @@ with col_dist:
         yaxis=dict(range=[0, 105]),
         showlegend=False,
     )
+    fig = apply_theme(fig, height=450, title="Your Title Here")
     st.plotly_chart(fig_pct, use_container_width=True)
 
 st.markdown("---")
@@ -176,6 +180,7 @@ with col_scatter:
         height=450,
         legend_title="Era",
     )
+    fig = apply_theme(fig, height=450, title="Your Title Here")
 
     # Fix legend labels
     fig_qs.for_each_trace(
@@ -209,6 +214,7 @@ with col_box:
         yaxis_title="Total Score",
         showlegend=False,
     )
+    fig = apply_theme(fig, height=450, title="Your Title Here")
     st.plotly_chart(fig_box, use_container_width=True)
 
 st.markdown("---")
@@ -254,6 +260,7 @@ with col_line:
         xaxis_title="Year",
         yaxis_title="Average Score Component",
     )
+    fig = apply_theme(fig, height=450, title="Your Title Here")
     st.plotly_chart(fig_tp, use_container_width=True)
 
 with col_ratio:
@@ -289,6 +296,7 @@ with col_ratio:
         xaxis_title="Year",
         yaxis_title="TES / PCS Ratio",
     )
+    fig = apply_theme(fig, height=450, title="Your Title Here")
     st.plotly_chart(fig_ratio, use_container_width=True)
 
 st.markdown("---")
@@ -324,6 +332,7 @@ with col_sp_fs:
         xaxis_title="Year",
         yaxis_title="Average Quads",
     )
+    fig = apply_theme(fig, height=450, title="Your Title Here")
     st.plotly_chart(fig_spfs, use_container_width=True)
 
 with col_heatmap:
@@ -355,6 +364,7 @@ with col_heatmap:
         height=400,
         yaxis=dict(autorange='reversed'),
     )
+    fig = apply_theme(fig, height=450, title="Your Title Here")
     st.plotly_chart(fig_heat, use_container_width=True)
 
 st.markdown("---")

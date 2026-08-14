@@ -6,9 +6,9 @@ import numpy as np
 import sys
 import os
 
-sys.path.append(
-    os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
-)
+sys.path.append( os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
+from components.styles import load_css, apply_theme, PLOTLY_THEME
+st.markdown(load_css(), unsafe_allow_html=True)
 from components.data_loader import (
     load_aggregate, load_models,
     FEATURES, COLORS, MEDAL_COLORS
@@ -20,9 +20,7 @@ rf_model, lr_model, scaler = load_models()
 st.title("🤖 Medal Predictor — Interactive Model")
 st.markdown("---")
 
-# ─────────────────────────────────────────────
 # ROW 1: Model Performance Summary
-# ─────────────────────────────────────────────
 
 st.subheader("📊 Model Performance")
 
@@ -34,9 +32,7 @@ m4.metric("Class Balance", "Balanced Weights")
 
 st.markdown("---")
 
-# ─────────────────────────────────────────────
 # ROW 2: Feature Importance
-# ─────────────────────────────────────────────
 
 st.subheader("🔑 What Predicts a Medal?")
 
@@ -62,6 +58,7 @@ with col_imp:
         yaxis_title="",
         coloraxis_showscale=False,
     )
+    fig = apply_theme(fig, height=450, title="Your Title Here")
     st.plotly_chart(fig_imp, use_container_width=True)
 
 with col_explain:
@@ -83,11 +80,9 @@ with col_explain:
 
 st.markdown("---")
 
-# ─────────────────────────────────────────────
 # ROW 3: Interactive Predictor
-# ─────────────────────────────────────────────
 
-st.subheader("🎛️ Try It Yourself — Enter Scores")
+st.subheader("🎛️ Try It Yourself! Enter Scores")
 st.markdown(
     "Adjust the sliders to simulate any skater's "
     "performance and see their medal probability."
@@ -101,6 +96,7 @@ with col_inputs:
         ['Men', 'Women'],
         horizontal=True
     )
+
     gender_code = 1 if gender == 'Men' else 0
 
     if gender == 'Men':
@@ -119,6 +115,7 @@ with col_inputs:
         value=tss_range[2],
         step=1.0
     )
+
     tes_total = st.slider(
         "Technical Score (TES)",
         min_value=tes_range[0],
@@ -126,6 +123,7 @@ with col_inputs:
         value=tes_range[2],
         step=1.0
     )
+
     pcs_total = st.slider(
         "Program Components (PCS)",
         min_value=pcs_range[0],
@@ -133,6 +131,7 @@ with col_inputs:
         value=pcs_range[2],
         step=1.0
     )
+
     sp_rank = st.slider(
         "Short Program Rank",
         min_value=1,
@@ -150,7 +149,6 @@ with col_inputs:
                   if pcs_total > 0 else 1.0
 
 with col_results:
-    # Build input
     input_data = pd.DataFrame([{
         'total_tss'         : total_tss,
         'tes_total'         : tes_total,
@@ -165,95 +163,134 @@ with col_results:
     }])
 
     input_scaled = scaler.transform(input_data)
-
     rf_prob = rf_model.predict_proba(input_scaled)[0][1]
     lr_prob = lr_model.predict_proba(input_scaled)[0][1]
 
-    # Display probability
-    st.markdown("### 🎯 Medal Probability")
-
-    # Color based on probability
-    if rf_prob >= 0.7:
-        prob_color = "🥇"
-        assessment = "**Medal Likely**"
-        st.success(
-            f"{prob_color} {assessment} — "
-            f"This performance profile is in "
-            f"medal contention territory."
-        )
-    elif rf_prob >= 0.4:
-        prob_color = "🎯"
-        assessment = "**Podium Possible**"
-        st.warning(
-            f"{prob_color} {assessment} — "
-            f"Competitive but needs a strong "
-            f"Free Skate to medal."
-        )
+    # Color + emoji based on probability
+    if rf_prob >= 0.70:
+        color   = '#00C878'
+        emoji   = '🥇'
+        verdict = 'MEDAL LIKELY'
+        detail  = 'This performance is in medal territory.'
+    elif rf_prob >= 0.40:
+        color   = '#F39C12'
+        emoji   = '🎯'
+        verdict = 'PODIUM POSSIBLE'
+        detail  = 'Strong performance, needs clean Free Skate.'
     elif rf_prob >= 0.15:
-        prob_color = "📈"
-        assessment = "**Competitive**"
-        st.info(
-            f"{prob_color} {assessment} — "
-            f"In the field but unlikely to medal."
-        )
+        color   = '#00D4FF'
+        emoji   = '📈'
+        verdict = 'COMPETITIVE'
+        detail  = 'In the field but outside medal range.'
     else:
-        prob_color = "🚀"
-        assessment = "**Development Stage**"
-        st.error(
-            f"{prob_color} {assessment} — "
-            f"Significant gap to medal territory."
-        )
+        color   = '#E74C3C'
+        emoji   = '🚀'
+        verdict = 'DEVELOPMENT STAGE'
+        detail  = 'Significant gap to Olympic medal level.'
 
-    # Big number
-    st.markdown(
-        f"<h1 style='text-align: center; "
-        f"color: {'#27AE60' if rf_prob >= 0.5 else '#E74C3C'};'>"
-        f"{rf_prob*100:.1f}%</h1>",
-        unsafe_allow_html=True
-    )
-    st.caption("Random Forest Model Prediction")
+    # Big probability display
+    st.markdown(f"""
+    <div class='prob-display'>
+        <div style='font-size: 3rem;'>{emoji}</div>
+        <div class='prob-number' style='color: {color};'>
+            {rf_prob*100:.1f}%
+        </div>
+        <div style='color: {color}; font-weight: 700;
+                    font-size: 1rem; margin-top: 8px;
+                    letter-spacing: 0.1em;'>
+            {verdict}
+        </div>
+        <div class='prob-label'>{detail}</div>
+    </div>
+    """, unsafe_allow_html=True)
 
-    st.markdown("---")
-
-    # Model comparison
-    st.markdown("**Model Comparison:**")
-    st.metric("Random Forest",      f"{rf_prob*100:.1f}%")
-    st.metric("Logistic Regression", f"{lr_prob*100:.1f}%")
+    st.markdown("<br>", unsafe_allow_html=True)
 
     # Gauge chart
     fig_gauge = go.Figure(go.Indicator(
-        mode="gauge+number+delta",
-        value=rf_prob * 100,
-        title={'text': "Medal Probability (%)"},
-        delta={
-            'reference': 50,
-            'increasing': {'color': '#27AE60'},
-            'decreasing': {'color': '#E74C3C'},
-        },
-        gauge={
-            'axis': {'range': [0, 100]},
-            'bar': {'color': '#2C3E50'},
-            'steps': [
-                {'range': [0, 15],   'color': '#FADBD8'},
-                {'range': [15, 40],  'color': '#FDEBD0'},
-                {'range': [40, 70],  'color': '#FEF9E7'},
-                {'range': [70, 100], 'color': '#D5F5E3'},
+        mode  = "gauge+number",
+        value = rf_prob * 100,
+        number = dict(
+            suffix    = '%',
+            font      = dict(
+                color = color, size=36
+            )
+        ),
+        gauge = dict(
+            axis  = dict(
+                range    = [0, 100],
+                tickfont = dict(color='#7FB3D3'),
+            ),
+            bar   = dict(color=color, thickness=0.7),
+            bgcolor = 'rgba(15,32,64,0.8)',
+            borderwidth = 0,
+            steps = [
+                {'range': [0,  15],  'color': 'rgba(231,76,60,0.15)'},
+                {'range': [15, 40],  'color': 'rgba(243,156,18,0.15)'},
+                {'range': [40, 70],  'color': 'rgba(0,212,255,0.15)'},
+                {'range': [70, 100], 'color': 'rgba(0,200,120,0.15)'},
             ],
-            'threshold': {
-                'line': {'color': 'black', 'width': 3},
-                'thickness': 0.8,
-                'value': 50,
-            },
-        },
+            threshold = dict(
+                line      = dict(color='white', width=2),
+                thickness = 0.8,
+                value     = 50,
+            ),
+        ),
     ))
-    fig_gauge.update_layout(height=300)
+
+    fig_gauge = apply_theme(fig_gauge, height=260)
+    fig_gauge.update_layout(
+        margin = dict(t=20, b=0, l=20, r=20)
+    )
     st.plotly_chart(fig_gauge, use_container_width=True)
+
+    # Model comparison
+    col_rf, col_lr = st.columns(2)
+    col_rf.metric("Random Forest",       f"{rf_prob*100:.1f}%")
+    col_lr.metric("Logistic Regression", f"{lr_prob*100:.1f}%")
+
+    # What's holding this score back
+    st.markdown("<br>", unsafe_allow_html=True)
+    st.markdown(
+        "<div class='section-header' style='font-size:0.9rem;'>"
+        "💡 What Would Improve This Score?</div>",
+        unsafe_allow_html=True
+    )
+
+    if sp_rank > 3:
+        st.markdown(f"""
+        <div class='ice-card' style='padding:12px 16px;'>
+            <p>🎯 <strong style='color:#00D4FF;'>
+            Improve SP rank from #{sp_rank} to top 3
+            </strong> — SP rank is 53.8% of medal prediction.
+            This is the single biggest lever.</p>
+        </div>
+        """, unsafe_allow_html=True)
+
+    if total_tss < (275 if gender_code == 1 else 220):
+        gap = (275 if gender_code == 1 else 220) - total_tss
+        st.markdown(f"""
+        <div class='ice-card' style='padding:12px 16px;'>
+            <p>📊 <strong style='color:#00D4FF;'>
+            Score needs +{gap:.0f} points
+            </strong> to reach medal threshold
+            ({275 if gender_code == 1 else 220} pts).</p>
+        </div>
+        """, unsafe_allow_html=True)
+
+    if tes_total / (total_tss + 0.001) < 0.52:
+        st.markdown("""
+        <div class='ice-card' style='padding:12px 16px;'>
+            <p>⚡ <strong style='color:#00D4FF;'>
+            Increase technical content (TES)
+            </strong> — modern medals require
+            TES to be 52-57% of total score.</p>
+        </div>
+        """, unsafe_allow_html=True)
 
 st.markdown("---")
 
-# ─────────────────────────────────────────────
 # ROW 4: Preset Scenarios
-# ─────────────────────────────────────────────
 
 st.subheader("📋 Preset Scenarios — Quick Comparisons")
 
@@ -322,6 +359,7 @@ st.dataframe(
 st.markdown("---")
 
 # ── Takeaway ─────────────────────────────────
+
 st.success("""
 **📌 Model Insights:**
 

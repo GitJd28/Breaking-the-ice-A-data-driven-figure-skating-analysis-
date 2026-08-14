@@ -6,9 +6,9 @@ import numpy as np
 import sys
 import os
 
-sys.path.append(
-    os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
-)
+sys.path.append( os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
+from components.styles import load_css, apply_theme, PLOTLY_THEME
+st.markdown(load_css(), unsafe_allow_html=True)
 from components.data_loader import (
     load_aggregate, load_models,
     COLORS, MEDAL_COLORS, TRADITIONAL_NATIONS, FEATURES
@@ -155,13 +155,12 @@ fig_tiers.update_layout(
     yaxis_title=f"Target Score ({gender_road})",
     title=f"India's {gender_road}'s Score Targets",
 )
+fig = apply_theme(fig, height=450, title="Your Title Here")
 st.plotly_chart(fig_tiers, use_container_width=True)
 
 st.markdown("---")
 
-# ─────────────────────────────────────────────
 # ROW 3: Kazakhstan Case Study
-# ─────────────────────────────────────────────
 
 st.subheader("🇰🇿 The Kazakhstan Blueprint — Proof It's Possible")
 
@@ -225,6 +224,7 @@ with col_kaz:
             yaxis_title="Total Score",
             title="Kazakhstan's Olympic Journey",
         )
+        fig = apply_theme(fig, height=450, title="Your Title Here")
         st.plotly_chart(fig_kaz, use_container_width=True)
 
 with col_lesson:
@@ -266,9 +266,7 @@ with col_lesson:
 
 st.markdown("---")
 
-# ─────────────────────────────────────────────
 # ROW 4: Qualification Threshold History
-# ─────────────────────────────────────────────
 
 st.subheader(
     "📊 Historical Qualification Thresholds — "
@@ -323,13 +321,12 @@ fig_thresh.update_layout(
         tickvals=df_clean['year'].unique()
     ),
 )
+fig = apply_theme(fig, height=450, title="Your Title Here")
 st.plotly_chart(fig_thresh, use_container_width=True)
 
 st.markdown("---")
 
-# ─────────────────────────────────────────────
 # ROW 5: Data-Backed Recommendations
-# ─────────────────────────────────────────────
 
 st.subheader("✅ Data-Backed Recommendations for India")
 

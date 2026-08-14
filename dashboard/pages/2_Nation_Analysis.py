@@ -6,6 +6,8 @@ import sys
 import os
 
 sys.path.append(    os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
+from components.styles import load_css, apply_theme, PLOTLY_THEME
+st.markdown(load_css(), unsafe_allow_html=True)
 from components.data_loader import (
     load_aggregate, load_long,
     MEDAL_COLORS, COLORS, TRADITIONAL_NATIONS
@@ -136,6 +138,7 @@ with col_trend:
             tickvals=df_clean['year'].unique()
         ),
     )
+    fig = apply_theme(fig, height=450, title="Your Title Here")
     st.plotly_chart(fig_trend, use_container_width=True)
 
 with col_table:
@@ -223,6 +226,7 @@ with col_style:
         yaxis_title="Average Program Components (PCS)",
         coloraxis_colorbar_title="Medals",
     )
+    fig = apply_theme(fig, height=450, title="Your Title Here")
     st.plotly_chart(fig_style, use_container_width=True)
 
 with col_analysis:
@@ -337,6 +341,7 @@ fig_compare.update_layout(
         tickvals=df_clean['year'].unique()
     ),
 )
+fig = apply_theme(fig, height=450, title="Your Title Here")
 st.plotly_chart(fig_compare, use_container_width=True)
 st.markdown("---")
 
