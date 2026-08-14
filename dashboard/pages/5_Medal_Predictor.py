@@ -6,6 +6,23 @@ import numpy as np
 import sys
 import os
 
+from components.styles import (
+    load_css, apply_theme,
+    CHART_COLORS, MEDAL_COLORS_LIGHT
+)
+
+st.set_page_config(page_title="Page Name", layout="wide")
+st.markdown(load_css(), unsafe_allow_html=True)
+
+with st.sidebar:
+    st.markdown("""
+    <div class='sidebar-logo'>
+        <div class='icon'>⛸️</div>
+        <div class='name'>Break the Ice</div>
+        <div class='tag'>Figure Skating Analytics</div>
+    </div>
+    """, unsafe_allow_html=True)
+
 sys.path.append( os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 from components.styles import load_css, apply_theme, PLOTLY_THEME
 st.markdown(load_css(), unsafe_allow_html=True)
@@ -58,7 +75,7 @@ with col_imp:
         yaxis_title="",
         coloraxis_showscale=False,
     )
-    fig = apply_theme(fig, height=450, title="Your Title Here")
+    fig_imp = apply_theme(fig_imp, height=450)
     st.plotly_chart(fig_imp, use_container_width=True)
 
 with col_explain:
@@ -238,10 +255,10 @@ with col_results:
         ),
     ))
 
-    fig_gauge = apply_theme(fig_gauge, height=260)
     fig_gauge.update_layout(
         margin = dict(t=20, b=0, l=20, r=20)
     )
+    fig_gauge = apply_theme(fig_gauge, height=260)
     st.plotly_chart(fig_gauge, use_container_width=True)
 
     # Model comparison

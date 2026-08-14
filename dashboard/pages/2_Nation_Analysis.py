@@ -6,12 +6,32 @@ import sys
 import os
 
 sys.path.append(    os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
-from components.styles import load_css, apply_theme, PLOTLY_THEME
-st.markdown(load_css(), unsafe_allow_html=True)
+from components.styles import (
+    load_css, apply_theme,
+    CHART_COLORS, MEDAL_COLORS_LIGHT
+)
 from components.data_loader import (
     load_aggregate, load_long,
-    MEDAL_COLORS, COLORS, TRADITIONAL_NATIONS
+    MEDAL_COLORS_LIGHT, COLORS, TRADITIONAL_NATIONS
 )
+
+from components.styles import (
+    load_css, apply_theme,
+    CHART_COLORS, MEDAL_COLORS_LIGHT
+)
+
+st.set_page_config(page_title="Page Name", layout="wide")
+st.markdown(load_css(), unsafe_allow_html=True)
+
+with st.sidebar:
+    st.markdown("""
+    <div class='sidebar-logo'>
+        <div class='icon'>⛸️</div>
+        <div class='name'>Break the Ice</div>
+        <div class='tag'>Figure Skating Analytics</div>
+    </div>
+    """, unsafe_allow_html=True)
+
 
 df_raw, df_clean = load_aggregate()
 df_long = load_long()
@@ -107,7 +127,7 @@ with col_trend:
                     mode='markers',
                     name=f'{gender_name} Medals',
                     marker=dict(
-                        color=MEDAL_COLORS['Gold'],
+                        color=MEDAL_COLORS_LIGHT['Gold'],
                         size=16,
                         symbol='star',
                         line=dict(width=1, color='black'),
@@ -138,7 +158,7 @@ with col_trend:
             tickvals=df_clean['year'].unique()
         ),
     )
-    fig = apply_theme(fig, height=450, title="Your Title Here")
+    fig_trend = apply_theme(fig_trend, height=450)
     st.plotly_chart(fig_trend, use_container_width=True)
 
 with col_table:
@@ -226,7 +246,7 @@ with col_style:
         yaxis_title="Average Program Components (PCS)",
         coloraxis_colorbar_title="Medals",
     )
-    fig = apply_theme(fig, height=450, title="Your Title Here")
+    fig_style = apply_theme(fig_style, height=500)
     st.plotly_chart(fig_style, use_container_width=True)
 
 with col_analysis:
@@ -341,7 +361,7 @@ fig_compare.update_layout(
         tickvals=df_clean['year'].unique()
     ),
 )
-fig = apply_theme(fig, height=450, title="Your Title Here")
+fig_compare = apply_theme(fig_compare, height=400)
 st.plotly_chart(fig_compare, use_container_width=True)
 st.markdown("---")
 

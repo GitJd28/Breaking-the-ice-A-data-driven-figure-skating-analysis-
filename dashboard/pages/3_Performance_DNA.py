@@ -5,13 +5,30 @@ import plotly.graph_objects as go
 import numpy as np
 import sys
 import os
+from components.styles import (
+    load_css, apply_theme,
+    CHART_COLORS, MEDAL_COLORS_LIGHT_LIGHT
+)
+
+st.set_page_config(page_title="Page Name", layout="wide")
+st.markdown(load_css(), unsafe_allow_html=True)
+
+with st.sidebar:
+    st.markdown("""
+    <div class='sidebar-logo'>
+        <div class='icon'>⛸️</div>
+        <div class='name'>Break the Ice</div>
+        <div class='tag'>Figure Skating Analytics</div>
+    </div>
+    """, unsafe_allow_html=True)
+
 
 sys.path.append(    os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 from components.styles import load_css, apply_theme, PLOTLY_THEME
 st.markdown(load_css(), unsafe_allow_html=True)
 from components.data_loader import (
     load_aggregate, load_long,
-    MEDAL_COLORS, COLORS
+    MEDAL_COLORS_LIGHT, COLORS
 )
 df_raw, df_clean = load_aggregate()
 df_long = load_long()
@@ -70,7 +87,7 @@ with col_scatter:
                 mode='markers',
                 name=medal_type,
                 marker=dict(
-                    color=MEDAL_COLORS[medal_type],
+                    color=MEDAL_COLORS_LIGHT[medal_type],
                     size=size,
                     symbol=symbol,
                     opacity=opacity,
@@ -101,7 +118,7 @@ with col_scatter:
         xaxis=dict(range=[0, 32], dtick=5),
         yaxis=dict(range=[0, 32], autorange='reversed'),
     )
-    fig = apply_theme(fig, height=450, title="Your Title Here")
+    fig_sp = apply_theme(fig_sp, height=500)
     st.plotly_chart(fig_sp, use_container_width=True)
 
 with col_insight:
@@ -191,7 +208,7 @@ with col_bar:
         yaxis_title="Score Points",
         legend_title="Score Component",
     )
-    fig = apply_theme(fig, height=450, title="Your Title Here")
+    fig_bar = apply_theme(fig_bar, height=450)
     st.plotly_chart(fig_bar, use_container_width=True)
 
 with col_radar:
@@ -206,8 +223,8 @@ with col_radar:
     fig_radar = go.Figure()
 
     for medal_type, color in [
-        ('Gold',     MEDAL_COLORS['Gold']),
-        ('No Medal', MEDAL_COLORS['No Medal'])
+        ('Gold',     MEDAL_COLORS_LIGHT['Gold']),
+        ('No Medal', MEDAL_COLORS_LIGHT['No Medal'])
     ]:
         subset = df_clean[
             df_clean['medal_label'] == medal_type
@@ -248,7 +265,7 @@ with col_radar:
         ),
         legend=dict(x=0.8, y=1.1),
     )
-    fig = apply_theme(fig, height=450, title="Your Title Here")
+    fig_radar = apply_theme(fig_radar, height=450)
     st.plotly_chart(fig_radar, use_container_width=True)
 
 st.markdown("---")
@@ -284,7 +301,7 @@ with col_ded1:
         x='Medal Status',
         y='Deduction %',
         color='Medal Status',
-        color_discrete_map=MEDAL_COLORS,
+        color_discrete_map=MEDAL_COLORS_LIGHT,
         text='Deduction %',
     )
     fig_ded.update_traces(
@@ -297,7 +314,7 @@ with col_ded1:
         yaxis_title="% of Segments",
         yaxis=dict(range=[0, ded_pct['Deduction %'].max() * 1.3]),
     )
-    fig = apply_theme(fig, height=450, title="Your Title Here")
+    fig_ded = apply_theme(fig_ded, height=400)
     st.plotly_chart(fig_ded, use_container_width=True)
 
 with col_ded2:
@@ -324,7 +341,7 @@ with col_ded2:
         y='ded',
         color='medal_label',
         barmode='group',
-        color_discrete_map=MEDAL_COLORS,
+        color_discrete_map=MEDAL_COLORS_LIGHT,
     )
     fig_ded2.update_layout(
         height=400,
@@ -332,7 +349,7 @@ with col_ded2:
         yaxis_title="Avg Deduction Points",
         legend_title="Medal Status",
     )
-    fig = apply_theme(fig, height=450, title="Your Title Here")
+    fig_ded = apply_theme(fig_ded, height=400)
     st.plotly_chart(fig_ded2, use_container_width=True)
 
 st.markdown("---")
@@ -357,7 +374,7 @@ with col_hist:
         fig_rank.add_trace(go.Histogram(
             x=subset,
             name=medal_type,
-            marker_color=MEDAL_COLORS[medal_type],
+            marker_color=MEDAL_COLORS_LIGHT[medal_type],
             opacity=0.7,
             nbinsx=25,
         ))
@@ -375,7 +392,7 @@ with col_hist:
         yaxis_title="Count",
         legend_title="Medal Status",
     )
-    fig = apply_theme(fig, height=450, title="Your Title Here")
+    fig_rank = apply_theme(fig_rank, height=400)
     st.plotly_chart(fig_rank, use_container_width=True)
 
 with col_stats:

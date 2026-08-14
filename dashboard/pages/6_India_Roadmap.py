@@ -6,12 +6,29 @@ import numpy as np
 import sys
 import os
 
+from components.styles import (
+    load_css, apply_theme,
+    CHART_COLORS, MEDAL_COLORS_LIGHT
+)
+
+st.set_page_config(page_title="Page Name", layout="wide")
+st.markdown(load_css(), unsafe_allow_html=True)
+
+with st.sidebar:
+    st.markdown("""
+    <div class='sidebar-logo'>
+        <div class='icon'>⛸️</div>
+        <div class='name'>Break the Ice</div>
+        <div class='tag'>Figure Skating Analytics</div>
+    </div>
+    """, unsafe_allow_html=True)
+
 sys.path.append( os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 from components.styles import load_css, apply_theme, PLOTLY_THEME
 st.markdown(load_css(), unsafe_allow_html=True)
 from components.data_loader import (
     load_aggregate, load_models,
-    COLORS, MEDAL_COLORS, TRADITIONAL_NATIONS, FEATURES
+    COLORS, MEDAL_COLORS_LIGHT, TRADITIONAL_NATIONS, FEATURES
 )
 
 df_raw, df_clean = load_aggregate()
@@ -155,7 +172,7 @@ fig_tiers.update_layout(
     yaxis_title=f"Target Score ({gender_road})",
     title=f"India's {gender_road}'s Score Targets",
 )
-fig = apply_theme(fig, height=450, title="Your Title Here")
+fig_tiers = apply_theme(fig_tiers, height=450)
 st.plotly_chart(fig_tiers, use_container_width=True)
 
 st.markdown("---")
@@ -194,7 +211,7 @@ with col_kaz:
                 y=kaz_gold['total_tss'],
                 mode='markers',
                 marker=dict(
-                    color=MEDAL_COLORS['Gold'],
+                    color=MEDAL_COLORS_LIGHT['Gold'],
                     size=20, symbol='star',
                     line=dict(width=2, color='black'),
                 ),
@@ -224,7 +241,7 @@ with col_kaz:
             yaxis_title="Total Score",
             title="Kazakhstan's Olympic Journey",
         )
-        fig = apply_theme(fig, height=450, title="Your Title Here")
+        fig_kaz = apply_theme(fig_kaz, height=450)
         st.plotly_chart(fig_kaz, use_container_width=True)
 
 with col_lesson:
@@ -260,7 +277,7 @@ with col_lesson:
         2. Gradual score improvement
         3. Investment in technical training
         4. Breakthrough athlete (Shaidorov)
-        
+
         **India can replicate this model.**
         """)
 
@@ -321,7 +338,7 @@ fig_thresh.update_layout(
         tickvals=df_clean['year'].unique()
     ),
 )
-fig = apply_theme(fig, height=450, title="Your Title Here")
+fig_thresh = apply_theme(fig_thresh, height=450)
 st.plotly_chart(fig_thresh, use_container_width=True)
 
 st.markdown("---")
@@ -339,13 +356,13 @@ with rec1:
     - Build 50+ international-standard ice rinks
     - Currently ~30 rinks vs 2,000+ in USA
     - Concentrate in 3-4 training centers
-    
+
     **2. Talent Pipeline**
     - Identify athletes from roller skating,
       gymnastics, and dance backgrounds
     - Start competitive training before age 8
     - Send top prospects to train in Japan/Canada
-    
+
     **3. International Exposure**
     - Compete in ISU Challenger Series
     - Target Asian Open competitions
@@ -359,14 +376,14 @@ with rec2:
     - Our model shows SP rank is 53.8% of medal prediction
     - Prioritize Short Program consistency
     - Develop quad jump capability
-    
+
     **5. Score Targets (from our model)**
     - **Year 1-5:** Achieve 100+ (W) / 150+ (M) at
       international competitions
     - **Year 5-10:** Qualify for Olympics (152+ W / 202+ M)
     - **Year 10-15:** Top-10 finish (190+ W / 240+ M)
     - **Year 15-20:** Medal contention (220+ W / 275+ M)
-    
+
     **6. Follow the Kazakhstan Model**
     - KAZ went from first appearance to gold
       in a defined timeline
