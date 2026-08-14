@@ -6,12 +6,15 @@ import numpy as np
 import sys
 import os
 
+sys.path.append(
+    os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+)
+from components.data_loader import load_aggregate, load_worldchamp
 from components.styles import (
-    load_css, apply_theme,
-    CHART_COLORS, MEDAL_COLORS_LIGHT_LIGHT
+    load_css, apply_theme, CHART_COLORS
 )
 
-st.set_page_config(page_title="Page Name", layout="wide")
+st.set_page_config(page_title="Quad Revolution", page_icon="🔄", layout="wide")
 st.markdown(load_css(), unsafe_allow_html=True)
 
 with st.sidebar:
@@ -23,435 +26,209 @@ with st.sidebar:
     </div>
     """, unsafe_allow_html=True)
 
-
-sys.path.append(    os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
-from components.styles import load_css, apply_theme, PLOTLY_THEME
-st.markdown(load_css(), unsafe_allow_html=True)
-from components.data_loader import (
-    load_aggregate, load_long,
-    MEDAL_COLORS_LIGHT, COLORS
-)
 df_raw, df_clean = load_aggregate()
-df_long = load_long()
-st.title("🧬 Performance DNA — What Wins Medals?")
-st.markdown("---")
+df_wc = load_worldchamp()
 
-# ROW 1: Headline Finding
-st.warning("""
-**🔑 Headline Finding:**
-Short Program rank alone explains **53.8%** of medal
-prediction in our Random Forest model — more than
-total score, technical score, or artistry combined.
-
-**Where you stand after the Short Program is the
-single most important factor in winning an Olympic medal.**
-""")
-
-st.markdown("---")
-
-# ROW 2: SP Rank vs Final Rank
-st.subheader("📋 Short Program Rank vs Final Rank")
 st.markdown(
-    "Does leading after the Short Program guarantee gold?"
+    "<div class='page-title'>🔄 The Quad Revolution</div>",
+    unsafe_allow_html=True
+)
+st.markdown(
+    "<div class='page-subtitle'>"
+    "How quad jumps fundamentally changed figure skating post-2014, "
+    "using World Championship data from 2005–2024."
+    "</div>",
+    unsafe_allow_html=True
 )
 
-gender_sp = st.radio(
-    "Gender:", ['Both', 'Men', 'Women'],
-    horizontal=True, key='sp_gender'
+# Metrics
+pre  = df_wc[df_wc['quad_era'] == 0]
+post = df_wc[df_wc['quad_era'] == 1]
+corr = df_wc['total_quads'].corr(df_wc['total_score'])
+
+q1, q2, q3 = st.columns(3)
+cards = [
+    (f"{pre['total_quads'].mean():.2f}", "Avg Quads Pre-2014", "Per skater"),
+    (f"{post['total_quads'].mean():.2f}", "Avg Quads Post-2014",
+     f"+{post['total_quads'].mean()-pre['total_quads'].mean():.2f} increase"),
+    (f"r = {corr:.3f}", "Quads ↔ Score", "Strong positive"),
+]
+for col, (num, lbl, sub) in zip([q1, q2, q3], cards):
+    with col:
+        st.markdown(f"""
+        <div class='stat-card-blue'>
+            <div class='num'>{num}</div>
+            <div class='lbl'>{lbl}</div>
+            <div class='sub'>{sub}</div>
+        </div>
+        """, unsafe_allow_html=True)
+
+st.markdown("<br>", unsafe_allow_html=True)
+
+# Quads over time
+st.markdown(
+    "<div class='section-title'>📈 Quad Jumps Per Skater Over Time</div>",
+    unsafe_allow_html=True
 )
 
-if gender_sp == 'Men':
-    df_sp = df_clean[df_clean['gender'] == 'M']
-elif gender_sp == 'Women':
-    df_sp = df_clean[df_clean['gender'] == 'W']
-else:
-    df_sp = df_clean.copy()
+col_t, col_p = st.columns(2)
 
-col_scatter, col_insight = st.columns([2, 1])
-
-with col_scatter:
-    fig_sp = go.Figure()
-
-    for medal_type in ['No Medal', 'Bronze', 'Silver', 'Gold']:
-        subset = df_sp[df_sp['medal_label'] == medal_type]
-        subset = subset.dropna(subset=['final_rank_num'])
-
-        size = 8 if medal_type == 'No Medal' else 14
-        symbol = 'circle' if medal_type == 'No Medal' \
-                 else 'star'
-        opacity = 0.3 if medal_type == 'No Medal' else 0.9
-
-        if len(subset) > 0:
-            fig_sp.add_trace(go.Scatter(
-                x=subset['sp_rank'],
-                y=subset['final_rank_num'],
-                mode='markers',
-                name=medal_type,
-                marker=dict(
-                    color=MEDAL_COLORS_LIGHT[medal_type],
-                    size=size,
-                    symbol=symbol,
-                    opacity=opacity,
-                    line=dict(width=0.5, color='white'),
-                ),
-                text=subset['skater'],
-                hovertemplate=(
-                    "<b>%{text}</b><br>"
-                    "SP Rank: %{x}<br>"
-                    "Final Rank: %{y}<extra></extra>"
-                ),
-            ))
-
-    # Perfect diagonal
-    max_rank = int(df_sp['sp_rank'].max())
-    fig_sp.add_trace(go.Scatter(
-        x=list(range(1, max_rank + 1)),
-        y=list(range(1, max_rank + 1)),
-        mode='lines',
-        name='SP = Final (no change)',
-        line=dict(dash='dash', color='gray', width=1),
-    ))
-
-    fig_sp.update_layout(
-        height=500,
-        xaxis_title="Short Program Rank",
-        yaxis_title="Final Rank",
-        xaxis=dict(range=[0, 32], dtick=5),
-        yaxis=dict(range=[0, 32], autorange='reversed'),
-    )
-    fig = apply_theme(fig, height=450)
-    st.plotly_chart(fig_sp, use_container_width=True)
-
-with col_insight:
-    st.markdown("**SP → Gold Conversion**")
-
-    sp1 = df_clean[df_clean['sp_rank'] == 1]
-    sp1_gold = sp1[sp1['medal'] == 1]
-    sp3 = df_clean[df_clean['sp_rank'] <= 3]
-    sp3_medal = sp3[sp3['medal'] > 0]
-
-    st.metric(
-        "SP Rank 1 → Gold",
-        f"{len(sp1_gold)}/{len(sp1)} "
-        f"({len(sp1_gold)/max(len(sp1),1)*100:.0f}%)"
-    )
-    st.metric(
-        "SP Top 3 → Any Medal",
-        f"{len(sp3_medal)}/{len(sp3)} "
-        f"({len(sp3_medal)/max(len(sp3),1)*100:.0f}%)"
-    )
-
-    st.markdown("---")
-
-    # Comeback stories
-    comebacks = df_clean[
-        (df_clean['medal'] > 0) &
-        (df_clean['sp_rank'] > 3)
-    ].sort_values('sp_rank', ascending=False)
-
-    if len(comebacks) > 0:
-        st.markdown("**🔥 Biggest Comebacks**")
-        st.markdown("*Medalists who ranked below 3rd after SP:*")
-        for _, row in comebacks.head(5).iterrows():
-            medal_emoji = {
-                1: '🥇', 2: '🥈', 3: '🥉'
-            }.get(row['medal'], '')
-
-            st.markdown(
-                f"- {medal_emoji} **{row['skater']}** "
-                f"({row['nation']}, {int(row['year'])}): "
-                f"SP #{int(row['sp_rank'])} → "
-                f"Final #{int(row['final_rank_num'])}"
-            )
-
-st.markdown("---")
-
-# ROW 3: Score Component Breakdown
-
-st.subheader("📊 Score Anatomy — What Makes a Medal Score?")
-col_bar, col_radar = st.columns(2)
-with col_bar:
-    st.markdown("**Average Score Breakdown by Medal Status**")
-    breakdown = (
-        df_clean.groupby('medal_label')
-        .agg(
-            TES_SP=('tes_sp', 'mean'),
-            PCS_SP=('pcs_sp', 'mean'),
-            TES_FS=('tes_fs', 'mean'),
-            PCS_FS=('pcs_fs', 'mean'),
-        )
-        .reindex(['Gold', 'Silver', 'Bronze', 'No Medal'])
-    )
-
-    fig_bar = go.Figure()
-
-    bar_colors = ['#E74C3C', '#3498DB', '#2ECC71', '#F39C12']
-    components = ['TES_SP', 'PCS_SP', 'TES_FS', 'PCS_FS']
-    comp_labels = [
-        'TES (Short)', 'PCS (Short)',
-        'TES (Free)',  'PCS (Free)'
-    ]
-
-    for comp, label, color in zip(
-        components, comp_labels, bar_colors
-    ):
-        fig_bar.add_trace(go.Bar(
-            x=breakdown.index,
-            y=breakdown[comp],
-            name=label,
-            marker_color=color,
-        ))
-
-    fig_bar.update_layout(
-        barmode='stack',
-        height=450,
-        xaxis_title="Medal Status",
-        yaxis_title="Score Points",
-        legend_title="Score Component",
-    )
-    fig = apply_theme(fig, height=450, title="Your Title Here")
-    st.plotly_chart(fig_bar, use_container_width=True)
-
-with col_radar:
-    st.markdown("**Medal Profile — Normalized Comparison**")
-
-    categories = [
-        'TES (SP)', 'PCS (SP)',
-        'TES (FS)', 'PCS (FS)',
-        'Score Momentum'
-    ]
-
-    fig_radar = go.Figure()
-
-    for medal_type, color in [
-        ('Gold',     MEDAL_COLORS_LIGHT['Gold']),
-        ('No Medal', MEDAL_COLORS_LIGHT['No Medal'])
-    ]:
-        subset = df_clean[
-            df_clean['medal_label'] == medal_type
-        ]
-        if len(subset) > 0:
-            # Normalize to 0-1 scale
-            values = [
-                subset['tes_sp'].mean()
-                / df_clean['tes_sp'].max(),
-                subset['pcs_sp'].mean()
-                / df_clean['pcs_sp'].max(),
-                subset['tes_fs'].mean()
-                / df_clean['tes_fs'].max(),
-                subset['pcs_fs'].mean()
-                / df_clean['pcs_fs'].max(),
-                subset['score_momentum'].mean()
-                / df_clean['score_momentum'].max(),
-            ]
-            # Close the radar
-            values.append(values[0])
-
-            fig_radar.add_trace(go.Scatterpolar(
-                r=values,
-                theta=categories + [categories[0]],
-                fill='toself',
-                name=medal_type,
-                line=dict(color=color, width=2),
-                opacity=0.6,
-            ))
-
-    fig_radar.update_layout(
-        height=450,
-        polar=dict(
-            radialaxis=dict(
-                visible=True,
-                range=[0, 1]
-            )
-        ),
-        legend=dict(x=0.8, y=1.1),
-    )
-    fig = apply_theme(fig, height=450, title="Your Title Here")
-    st.plotly_chart(fig_radar, use_container_width=True)
-
-st.markdown("---")
-
-# ROW 4: Deduction Analysis
-
-st.subheader("⚠️ Deduction Analysis — Do Falls Cost Medals?")
-# Merge long with medal info
-df_long_medal = df_long.merge(
-    df_clean[['year', 'gender', 'skater',
-              'medal', 'medal_label']],
-    on=['year', 'gender', 'skater'],
-    how='left'
-)
-df_long_medal['medal_label'] = ( df_long_medal['medal_label'].fillna('No Medal'))
-
-col_ded1, col_ded2 = st.columns(2)
-with col_ded1:
-    st.markdown(
-        "**% of Segments With Deductions by Medal Status**"
-    )
-
-    ded_pct = (
-        df_long_medal.groupby('medal_label')['has_deduction']
-        .mean()
-        .reindex(['Gold', 'Silver', 'Bronze', 'No Medal'])
-        * 100
+with col_t:
+    qt = df_wc.groupby('year').agg(
+        avg=('total_quads', 'mean'), mx=('total_quads', 'max')
     ).reset_index()
-    ded_pct.columns = ['Medal Status', 'Deduction %']
 
-    fig_ded = px.bar(
-        ded_pct,
-        x='Medal Status',
-        y='Deduction %',
-        color='Medal Status',
-        color_discrete_map=MEDAL_COLORS_LIGHT,
-        text='Deduction %',
+    fig_t = go.Figure()
+    fig_t.add_trace(go.Bar(
+        x=qt['year'], y=qt['avg'], name='Avg Quads',
+        marker_color=[
+            CHART_COLORS['no_medal'] if y < 2014 else CHART_COLORS['primary']
+            for y in qt['year']
+        ],
+    ))
+    fig_t.add_trace(go.Scatter(
+        x=qt['year'], y=qt['mx'], name='Max Quads',
+        mode='lines+markers',
+        line=dict(color=CHART_COLORS['danger'], width=2),
+        marker=dict(size=7), yaxis='y2',
+    ))
+    fig_t.add_vline(x=2014, line_dash="dash", line_color="black",
+                    annotation_text="Quad Era")
+    fig_t.update_layout(
+        xaxis_title="Year", yaxis_title="Avg Quads",
+        yaxis2=dict(title="Max Quads", overlaying='y', side='right'),
+        title="Average & Max Quads Per Year",
     )
-    fig_ded.update_traces(
-        texttemplate='%{text:.1f}%',
-        textposition='outside'
-    )
-    fig_ded.update_layout(
-        height=400,
-        showlegend=False,
-        yaxis_title="% of Segments",
-        yaxis=dict(range=[0, ded_pct['Deduction %'].max() * 1.3]),
-    )
-    fig = apply_theme(fig, height=450, title="Your Title Here")
-    st.plotly_chart(fig_ded, use_container_width=True)
+    fig_t = apply_theme(fig_t, height=420)
+    st.plotly_chart(fig_t, use_container_width=True)
 
-with col_ded2:
-    st.markdown(
-        "**Average Deduction by Segment**"
+with col_p:
+    qt2 = df_wc.groupby('year')['total_quads'].apply(
+        lambda x: (x > 0).mean() * 100
+    ).reset_index()
+    qt2.columns = ['year', 'pct']
+
+    fig_p = px.area(qt2, x='year', y='pct',
+                    color_discrete_sequence=[CHART_COLORS['primary']])
+    fig_p.add_vline(x=2014, line_dash="dash", line_color="black")
+    fig_p.update_layout(
+        xaxis_title="Year", yaxis_title="% With Quads",
+        yaxis=dict(range=[0, 105]),
+        title="% Skaters Attempting Quads", showlegend=False,
     )
+    fig_p = apply_theme(fig_p, height=420)
+    st.plotly_chart(fig_p, use_container_width=True)
 
-    ded_avg = (
-        df_long_medal.groupby(
-            ['segment', 'medal_label']
-        )['ded']
-        .mean()
-        .reset_index()
-    )
-    ded_avg = ded_avg[
-        ded_avg['medal_label'].isin(
-            ['Gold', 'Silver', 'Bronze', 'No Medal']
-        )
-    ]
+st.markdown("<br>", unsafe_allow_html=True)
 
-    fig_ded2 = px.bar(
-        ded_avg,
-        x='segment',
-        y='ded',
-        color='medal_label',
-        barmode='group',
-        color_discrete_map=MEDAL_COLORS_LIGHT,
-    )
-    fig_ded2.update_layout(
-        height=400,
-        xaxis_title="Segment",
-        yaxis_title="Avg Deduction Points",
-        legend_title="Medal Status",
-    )
-    fig = apply_theme(fig, height=450, title="Your Title Here")
-    st.plotly_chart(fig_ded2, use_container_width=True)
-
-st.markdown("---")
-
-# ROW 5: Rank Change Distribution
-
-st.subheader("🔄 Rank Change — SP to Final")
+# Quads vs Score
 st.markdown(
-    "*Positive = improved position in Free Skate. "
-    "Negative = dropped.*"
+    "<div class='section-title'>🎯 Quads vs Total Score</div>",
+    unsafe_allow_html=True
 )
 
-col_hist, col_stats = st.columns([2, 1])
-with col_hist:
-    fig_rank = go.Figure()
+col_s, col_b = st.columns(2)
 
-    for medal_type in ['No Medal', 'Gold']:
-        subset = df_clean[
-            df_clean['medal_label'] == medal_type
-        ]['rank_change']
-
-        fig_rank.add_trace(go.Histogram(
-            x=subset,
-            name=medal_type,
-            marker_color=MEDAL_COLORS_LIGHT[medal_type],
-            opacity=0.7,
-            nbinsx=25,
+with col_s:
+    fig_qs = go.Figure()
+    for era, label, color in [
+        (0, 'Pre-2014',  CHART_COLORS['no_medal']),
+        (1, 'Post-2014', CHART_COLORS['primary']),
+    ]:
+        subset = df_wc[df_wc['quad_era'] == era]
+        fig_qs.add_trace(go.Scatter(
+            x=subset['total_quads'], y=subset['total_score'],
+            mode='markers', name=label,
+            marker=dict(color=color, size=7, opacity=0.6),
         ))
 
-    fig_rank.add_vline(
-        x=0, line_dash="dash",
-        line_color="gray",
-        annotation_text="No Change"
+    x_vals = df_wc['total_quads'].values
+    y_vals = df_wc['total_score'].values
+    z = np.polyfit(x_vals, y_vals, 1)
+    p = np.poly1d(z)
+    x_line = np.linspace(x_vals.min(), x_vals.max(), 100)
+    fig_qs.add_trace(go.Scatter(
+        x=x_line, y=p(x_line), mode='lines',
+        name=f'Trend (r={corr:.3f})',
+        line=dict(color='black', width=2, dash='dash'),
+    ))
+    fig_qs.update_layout(
+        xaxis_title="Total Quads", yaxis_title="Total Score",
+        title="Quads vs Score Correlation",
     )
+    fig_qs = apply_theme(fig_qs, height=420)
+    st.plotly_chart(fig_qs, use_container_width=True)
 
-    fig_rank.update_layout(
-        barmode='overlay',
-        height=400,
-        xaxis_title="Rank Change (SP → Final)",
-        yaxis_title="Count",
-        legend_title="Medal Status",
+with col_b:
+    df_wc['quad_bucket'] = pd.cut(
+        df_wc['total_quads'], bins=[-1, 0, 1, 2, 3, 8],
+        labels=['0', '1', '2', '3', '4+']
     )
-    fig = apply_theme(fig, height=450, title="Your Title Here")
-    st.plotly_chart(fig_rank, use_container_width=True)
+    fig_box = px.box(
+        df_wc, x='quad_bucket', y='total_score',
+        color='quad_bucket',
+        color_discrete_sequence=px.colors.sequential.Blues[2:],
+    )
+    fig_box.update_layout(
+        xaxis_title="Quads", yaxis_title="Total Score",
+        title="Score by Quad Count", showlegend=False,
+    )
+    fig_box = apply_theme(fig_box, height=420)
+    st.plotly_chart(fig_box, use_container_width=True)
 
-with col_stats:
-    st.markdown("**Rank Change Statistics**")
+st.markdown("<br>", unsafe_allow_html=True)
 
-    for medal_type in ['Gold', 'Silver', 'Bronze', 'No Medal']:
-        subset = df_clean[
-            df_clean['medal_label'] == medal_type
-        ]['rank_change']
-        emoji = {
-            'Gold': '🥇', 'Silver': '🥈',
-            'Bronze': '🥉', 'No Medal': '🔵'
-        }[medal_type]
-        st.markdown(
-            f"{emoji} **{medal_type}**: "
-            f"avg {subset.mean():+.1f} | "
-            f"range [{subset.min():.0f}, "
-            f"{subset.max():.0f}]"
-        )
+# TES vs PCS over time
+st.markdown(
+    "<div class='section-title'>⚖️ Technical vs Artistic Over Time</div>",
+    unsafe_allow_html=True
+)
 
-    st.markdown("---")
-    st.markdown("**Interpretation:**")
+col_l, col_r = st.columns(2)
 
-    gold_avg = df_clean[
-        df_clean['medal'] == 1
-    ]['rank_change'].mean()
+with col_l:
+    tp = df_wc.groupby('year')[['tes_total', 'pcs_total']].mean().reset_index()
+    fig_tp = go.Figure()
+    fig_tp.add_trace(go.Scatter(
+        x=tp['year'], y=tp['tes_total'],
+        mode='lines+markers', name='Technical (TES)',
+        line=dict(color=CHART_COLORS['primary'], width=3), marker=dict(size=8),
+    ))
+    fig_tp.add_trace(go.Scatter(
+        x=tp['year'], y=tp['pcs_total'],
+        mode='lines+markers', name='Artistic (PCS)',
+        line=dict(color=CHART_COLORS['accent'], width=3), marker=dict(size=8),
+    ))
+    fig_tp.add_vline(x=2014, line_dash="dash", line_color="black")
+    fig_tp.update_layout(
+        xaxis_title="Year", yaxis_title="Avg Score Component",
+        title="TES vs PCS Over Time",
+    )
+    fig_tp = apply_theme(fig_tp, height=420)
+    st.plotly_chart(fig_tp, use_container_width=True)
 
-    if gold_avg > 0:
-        st.info(
-            f"Gold medalists improve on average "
-            f"**{gold_avg:.1f} positions** from "
-            f"SP to Final — showing strong "
-            f"Free Skate execution under pressure."
-        )
-    else:
-        st.info(
-            f"Gold medalists maintain or slightly "
-            f"adjust their position ({gold_avg:+.1f}), "
-            f"showing consistency across both programs."
-        )
+with col_r:
+    sp_fs = df_wc.groupby('year')[['quads_in_sp', 'quads_in_fs']].mean().reset_index()
+    fig_sf = go.Figure()
+    fig_sf.add_trace(go.Bar(
+        x=sp_fs['year'], y=sp_fs['quads_in_sp'],
+        name='Quads in SP', marker_color=CHART_COLORS['no_medal'],
+    ))
+    fig_sf.add_trace(go.Bar(
+        x=sp_fs['year'], y=sp_fs['quads_in_fs'],
+        name='Quads in FS', marker_color=CHART_COLORS['primary'],
+    ))
+    fig_sf.update_layout(
+        barmode='group', xaxis_title="Year", yaxis_title="Avg Quads",
+        title="SP vs FS Quad Distribution",
+    )
+    fig_sf = apply_theme(fig_sf, height=420)
+    st.plotly_chart(fig_sf, use_container_width=True)
 
-st.markdown("---")
-
-# Key Takeaway 
-st.success("""
-**📌 Performance DNA Summary:**
-
-1. **SP Rank is King** — 53.8% of medal prediction
-   power. A strong Short Program sets up everything.
-
-2. **Score Structure** — Medalists excel in ALL four
-   components (TES SP, PCS SP, TES FS, PCS FS),
-   but the biggest gap is in Free Skate TES.
-
-3. **Deductions** — Medal winners have significantly
-   fewer deductions. Clean programs win medals.
-
-4. **Comeback Potential** — While SP rank dominates,
-   some champions have come from behind, proving
-   the Free Skate can rewrite the story.
-""")
+st.markdown("<br>", unsafe_allow_html=True)
+st.success(
+    f"📌 **Summary:** Average quads jumped from "
+    f"{pre['total_quads'].mean():.1f} to {post['total_quads'].mean():.1f} "
+    f"post-2014. Correlation with score is r={corr:.3f}. "
+    f"For India: quad capability is now mandatory for men's competition."
+)
