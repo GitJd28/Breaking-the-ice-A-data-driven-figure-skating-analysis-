@@ -1,6 +1,6 @@
 # ⛸️ Break the Ice - What Actually Separates Olympic Figure Skating Champions
 
-**[Live dashboard →](https://breaktheice.streamlit.app/)**
+**[Live dashboard](https://breaktheice.streamlit.app/)**
 
 I used to skate as a kid, and I've been watching figure skating at every Olympics since, and I always wondered what actually separates the skaters on the podium from the ones just off it. Is it the technical content? The short program? Consistency over a single big jump? So I pulled 20 years of ISU competition data and built a model to find out, rather than go on commentary-booth intuition.
 
@@ -106,11 +106,11 @@ figure-skating-project/
 └── requirements.txt
 ```
 
-## What I'd add with more time
+## Future Scope
 
-- Extending beyond singles to pairs and ice dance
-- Bringing in real infrastructure data  rink counts, federation funding  rather than relying on Kazakhstan as the only real-world reference point
-- Running the same development-framework model against a few other emerging programs (not just India) to see how well the four-tier benchmarks generalize
+- Extending beyond singles to pairs and ice dance.
+- Bringing in real infrastructure data  rink counts, federation funding  rather than relying on Kazakhstan as the only real-world reference point.
+- Running the same development-framework model against a few other emerging programs (not just India) to see how well the four-tier benchmarks generalize. 
 
 ## Author
 
