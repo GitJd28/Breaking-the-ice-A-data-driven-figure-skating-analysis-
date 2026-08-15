@@ -26,9 +26,9 @@ with st.sidebar:
 
 # Page header
 st.markdown("""
-<div class='page-title'>Welcome to Break the Ice</div>
+<div class='page-title'>Welcome to Break the Ice!</div>
 <div class='page-subtitle'>
-    A data-driven analysis of Olympic Figure Skating —
+    A data-driven analysis of Olympic Figure Skating 
     uncovering what separates champions from the field.
 </div>
 """, unsafe_allow_html=True)
@@ -67,12 +67,12 @@ findings = [
     ("🏅 The 90-Point Wall",
      "Medal winners score an average of "
      "<b style='color:#3D7EFF;'>90+ points more</b> "
-     "than non-medalists. A structural gap — not "
+     "than non-medalists. A structural gap, not "
      "random variation."),
     ("📋 Short Program is Everything",
      "Short Program rank alone explains "
      "<b style='color:#3D7EFF;'>53.8%</b> of medal "
-     "prediction — the single most important factor "
+     "prediction, the single most important factor "
      "in our model."),
     ("🔄 The Quad Revolution",
      "Post-2014, quad jumps correlate with scores at "
