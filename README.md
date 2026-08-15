@@ -72,6 +72,12 @@ uv run streamlit run dashboard/app.py
 
 Opens at `http://localhost:8501`
 
+📸 Screenshots & Demo
+
+Screenshots of all six dashboard pages are available in assets/screenshots/.
+
+A full walkthrough video is here (too large to host directly in the repo): Watch the demo:  https://drive.google.com/file/d/1irOEpQfGur3LOORBi1JUFkFE3sUMGAzD/view?usp=sharing 
+
 ## Dashboard pages
 
 1. **Overview** - the global picture: nation dominance, score distributions, the medal gap
@@ -92,6 +98,7 @@ figure-skating-project/
 ├── data/
 │ ├── raw/ # original CSVs
 │ └── processed/ # cleaned versions
+├── assets/screenshots
 ├── models/ # trained model + scaler artifacts
 ├── outputs/
 │ ├── eda/ # EDA charts
