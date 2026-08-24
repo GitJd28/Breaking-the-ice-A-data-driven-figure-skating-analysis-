@@ -89,7 +89,11 @@ A full walkthrough video is here (too large to host directly in the repo): Watch
 
 ## Stack
 
-Python 3.11, pandas/numpy/scipy for the data work, scikit-learn for modeling, Plotly (+ matplotlib/seaborn for static EDA), Streamlit for the dashboard, deployed on Streamlit Community Cloud. `uv` for environment management.
+Python 3.11, pandas/numpy/scipy for the data work
+scikit-learn for modeling
+Plotly (+ matplotlib/seaborn for static EDA)
+Streamlit for the dashboard, deployed on Streamlit Community Cloud.
+`uv` for environment management.
 
 ## Project structure
 
