@@ -2,6 +2,9 @@
 
 **[Live dashboard](https://breaktheice.streamlit.app/)**
 
+<img width="1072" height="573" alt="image" src="https://github.com/user-attachments/assets/046d661c-e2b3-4738-8609-26ca4f7f6530" />
+
+
 I used to skate as a kid, and I've been watching figure skating at every Olympics since, and I always wondered what actually separates the skaters on the podium from the ones just off it. Is it the technical content? The short program? Consistency over a single big jump? So I pulled 20 years of ISU competition data and built a model to find out, rather than go on commentary-booth intuition.
 
 Along the way, the same framework turned out to answer a second question I was curious about: for a country with no Olympic figure skating history at all, what would it actually, numerically take to get from zero to competitive? I use India as the worked example for that  not because the project is about India, but because it's the case I know best and it's a clean test of whether the model's benchmarks hold up for a program starting from scratch.
