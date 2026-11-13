@@ -19,9 +19,8 @@ from sklearn.inspection        import permutation_importance
 os.makedirs("outputs/model", exist_ok=True)
 os.makedirs("models",        exist_ok=True)
 
-# ─────────────────────────────────────────────
 # 1. LOAD + PREPARE DATA
-# ─────────────────────────────────────────────
+
 
 print("="*60)
 print("  FIGURE SKATING MEDAL PREDICTOR")
@@ -32,7 +31,7 @@ df = pd.read_csv("data/processed/agg_clean.csv")
 
 print(f"\n📂 Raw data loaded: {df.shape}")
 
-# ── Filter: completed skaters only ──────────
+#  Filter: completed skaters only 
 df_model = df[
     (df['skater_status'] == 'COMPLETED') &
     (df['total_tss'] > 0)
@@ -40,13 +39,13 @@ df_model = df[
 
 print(f"📂 After filtering FNR/WD/DSQ: {df_model.shape}")
 
-# ── Encode gender ────────────────────────────
+#  Encode gender 
 df_model['gender_encoded'] = (
     df_model['gender']
     .map({'M': 1, 'W': 0})
 )
 
-# ── Select features ──────────────────────────
+# Select features 
 # Option A (aggregate) + Option C (derived)
 # Deliberately exclude segment-level scores
 # to avoid multicollinearity
@@ -71,7 +70,7 @@ FEATURES = [
 
 TARGET = 'is_medal'
 
-# ── Build X, y ───────────────────────────────
+# Build X, y 
 X = df_model[FEATURES].copy()
 y = df_model[TARGET].copy()
 
@@ -120,7 +119,7 @@ print("\n" + "─"*60)
 print("  STEP 2: Model Training")
 print("─"*60)
 
-# ── Model A: Random Forest ───────────────────
+#  Model A: Random Forest
 print("\n  Training Random Forest...")
 rf_model = RandomForestClassifier(
     n_estimators=500,
@@ -133,7 +132,7 @@ rf_model = RandomForestClassifier(
 rf_model.fit(X_train_scaled, y_train)
 print("  ✅ Random Forest trained")
 
-# ── Model B: Logistic Regression ─────────────
+# ── Model B: Logistic Regression 
 print("\n  Training Logistic Regression...")
 lr_model = LogisticRegression(
     class_weight='balanced',
