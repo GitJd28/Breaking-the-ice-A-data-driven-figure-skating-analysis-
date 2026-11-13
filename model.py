@@ -185,9 +185,7 @@ for name, model in [("Random Forest",       rf_model),
           f"(±{rec_scores.std():.3f})")
 
 
-# ─────────────────────────────────────────────
 # 6. TEST SET EVALUATION
-# ─────────────────────────────────────────────
 
 print("\n" + "─"*60)
 print("  STEP 4: Test Set Evaluation")
@@ -211,15 +209,13 @@ for name, model in [("Random Forest",      rf_model),
         print(f"      {line}")
 
 
-# ─────────────────────────────────────────────
 # 7. FEATURE IMPORTANCE
-# ─────────────────────────────────────────────
 
 print("\n" + "─"*60)
 print("  STEP 5: Feature Importance Analysis")
 print("─"*60)
 
-# ── Random Forest built-in importance ────────
+# Random Forest built-in importance
 rf_importance = pd.DataFrame({
     'feature'   : FEATURES,
     'importance': rf_model.feature_importances_
@@ -231,7 +227,7 @@ for _, row in rf_importance.iterrows():
     print(f"    {row['feature']:<22} {bar} "
           f"{row['importance']:.4f}")
 
-# ── Logistic Regression coefficients ─────────
+# Logistic Regression coefficients 
 lr_coef = pd.DataFrame({
     'feature'    : FEATURES,
     'coefficient': lr_model.coef_[0]
@@ -244,10 +240,7 @@ for _, row in lr_coef.iterrows():
           f"{row['coefficient']:.4f}")
 
 
-# ─────────────────────────────────────────────
-# 8. VISUALIZATIONS
-# ─────────────────────────────────────────────
-
+# 8. VISUALIZATION
 print("\n" + "─"*60)
 print("  STEP 6: Generating Model Visualizations")
 print("─"*60)
@@ -270,7 +263,7 @@ plt.rcParams.update({
     'font.family'      : 'sans-serif',
 })
 
-# ── Chart 1: Feature Importance ──────────────
+# ── Chart 1: Feature Importance 
 fig, axes = plt.subplots(1, 2, figsize=(16, 7))
 fig.suptitle(
     "Feature Importance — What Predicts a Medal?",
@@ -330,7 +323,7 @@ plt.savefig("outputs/model/01_feature_importance.png",
 plt.close()
 print("  ✅ Saved: 01_feature_importance.png")
 
-# ── Chart 2: ROC Curves ──────────────────────
+#Chart 2: ROC Curves
 fig, ax = plt.subplots(figsize=(8, 7))
 
 for name, model, color in [
@@ -359,7 +352,7 @@ plt.savefig("outputs/model/02_roc_curve.png",
 plt.close()
 print("  ✅ Saved: 02_roc_curve.png")
 
-# ── Chart 3: Confusion Matrices ──────────────
+# ── Chart 3: Confusion Matrices 
 fig, axes = plt.subplots(1, 2, figsize=(14, 6))
 fig.suptitle(
     "Confusion Matrices — Test Set Performance",
@@ -433,10 +426,8 @@ plt.close()
 print("  ✅ Saved: 04_probability_distribution.png")
 
 
-# ─────────────────────────────────────────────
 # 9. INDIA SIMULATION
 # What score would India need?
-# ─────────────────────────────────────────────
 
 print("\n" + "─"*60)
 print("  STEP 7: India Scenario Simulation")
@@ -533,9 +524,7 @@ for scenario in women_scenarios:
           f"  {prob*100:>8.1f}%   {assessment}")
 
 
-# ─────────────────────────────────────────────
 # 10. SAVE MODELS + ARTIFACTS
-# ─────────────────────────────────────────────
 
 print("\n" + "─"*60)
 print("  STEP 8: Saving Models and Artifacts")
